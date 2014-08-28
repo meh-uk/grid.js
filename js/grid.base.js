@@ -992,7 +992,8 @@ $.fn.jqGrid = function( pin ) {
 				}
 				if (npage) {
 					if (p.lastpage && (page > p.lastpage || p.lastpage===1 || (page === p.page && page===p.lastpage)) ) {
-						return;
+						// Fix for the slow scrolling down bug....
+						//return;
 					}
 					if (grid.hDiv.loading) {
 						grid.timer = setTimeout(grid.populateVisible, p.scrollTimeout);
