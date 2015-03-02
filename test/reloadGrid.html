@@ -9,7 +9,8 @@
 		<script src="../dist/jsgrid-0.1.0.js"></script>
 		<link rel="stylesheet" href="../dist/jsgrid-0.1.0.css" />
 		<script type="text/javascript">
-				QUnit.test("refresh grid", function (assert) {
+				QUnit.test("load grid", function (assert) {
+					assert.expect(1);
 					var done = assert.async();
 					$('body').append('<table id="grid"></table>');
 					$('#grid').jqGrid({
@@ -25,9 +26,46 @@
 						datatype: 'json',
 						url: './data/basic.json',
 						gridComplete: function () {
-							alert('foo');
-							assert.equal($('#grid tr').length, 6);
+							assert.equal($('#grid tr').length, 10);
 							done();
+							setTimeout(function () { $('#grid').jqGrid('GridDestroy'); }, 50);
+						},
+						loadError: function () {
+							assert.equal(false, true);
+							
+							done();
+						}
+					});
+				});
+				
+				QUnit.test("reload grid", function (assert) {
+					assert.expect(2);
+					var timeToReload = true;
+					var done = assert.async();
+					$('body').append('<table id="grid2"></table>');
+					$('#grid2').jqGrid({
+						colModel: [
+							{ label: 'Inv No', name: 'id', width: 75, key: true },
+							{ label: 'Date', name: 'invdate', width: 90 },
+							{ label: 'Client', name: 'name', width: 100 },
+							{ label: 'Amount', name: 'amount', width: 80 },
+							{ label: 'Tax', name: 'tax', width: 80 },
+							{ label: 'Total', name: 'total', width: 80 },
+							{ label: 'Notes', name: 'note', width: 150 }
+						],
+						datatype: 'json',
+						url: './data/basic.json',
+						gridComplete: function (data) {
+							assert.equal($('#grid2 tr').length, 10);
+							if (timeToReload) {
+								timeToReload = false;
+								setTimeout(function () { $('#grid2').trigger('reloadGrid'); }, 20);
+							}
+							else {
+								// we have reloaded.
+								done();
+								setTimeout(function () { $('#grid2').jqGrid('GridDestroy'); }, 20);
+							}
 						},
 						loadError: function () {
 							assert.equal(false, true);
